@@ -1,2 +1,3 @@
 # otus-cpp
-Tasks of otus.ru courses
+
+This is the repository with homeworks of [otus c++'s](https://otus.ru/learning/73720/) courses.
