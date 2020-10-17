@@ -68,19 +68,21 @@ def gen_travis_yaml(changed):
     if not changed: return False
     stage_parts = []
     for changed_dir in changed:
-        yml_part = '    - script: |\n'
+        yml_part = '    - script: '
         if not stage_parts:
-            yml_part = '    - stage: Build && Test && Package\n      script: |\n'
-        yml_part += f"""              echo "{changed_dir}"
-              pushd {changed_dir}
-              mkdir build
-              cd build
-              cmake ..
-              cmake --build .
-              cmake --build . --target test
-              cmake --build . --target package
-              popd
-"""
+            yml_part = '    - stage: Build && Test && Package\n      script: '
+        commands = [
+            f"echo '{changed_dir}'",
+            f"pushd '{changed_dir}'",
+            "mkdir build",
+            "cd build",
+            "cmake ..",
+            "cmake --build .",
+            "cmake --build . --target test",
+            "cmake --build . --target package",
+            "popd",
+        ]
+        yml_part += ' && '.join(commands)
         stage_parts.append(yml_part)
 
     TRAVIS_YAML_NAME = '.travis.yml'
