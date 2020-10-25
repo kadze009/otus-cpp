@@ -169,17 +169,13 @@ def gen_travis_yaml(changed):
 os: linux
 dist: xenial
 compiler: gcc
-
-before_install:
-  # C++17
-  - sudo add-apt-repository --yes ppa:ubuntu-toolchain-r/test
-  - sudo apt-get update -qq
-
-# Install dependencies
-install:
-  # C++17
-  - sudo apt-get install -qq g++-7 libstdc++-7-dev
-  - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-7 90
+addons:
+  apt:
+    sources:
+      - ubuntu-toolchain-r-test
+    packages:
+      - g++-7
+      - libstdc++-7-dev
 
 before_script:
 - sudo apt-get install libboost-test-dev -y
