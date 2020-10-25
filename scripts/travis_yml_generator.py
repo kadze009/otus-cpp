@@ -174,8 +174,8 @@ addons:
     sources:
       - ubuntu-toolchain-r-test
     packages:
-      - g++-7
-      - libstdc++-7-dev
+      - g++-9
+      - libstdc++-9-dev
 
 before_script:
 - sudo apt-get install libboost-test-dev -y
