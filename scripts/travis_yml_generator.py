@@ -166,13 +166,26 @@ def gen_travis_yaml(changed):
     with open(TRAVIS_YAML_NAME, 'w') as f:
         f.write(gen_warning())
         f.write("""language: cpp
-dist: bionic
+os: linux
+dist: xenial
 compiler: gcc
+
+before_install:
+  # C++17
+  - sudo add-apt-repository --yes ppa:ubuntu-toolchain-r/test
+  - sudo apt-get update -qq
+
+# Install dependencies
+install:
+  # C++17
+  - sudo apt-get install -qq g++-6
+  - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-6 90
 
 before_script:
 - sudo apt-get install libboost-test-dev -y
 - echo "deb http://archive.ubuntu.com/ubuntu xenial main universe" | sudo tee -a /etc/apt/sources.list
 - sudo apt-get update -qq
+# Manual install GTest
 - mkdir /tmp/gtest-src /tmp/gtest-build /tmp/gtest-install
 - git clone https://github.com/google/googletest /tmp/gtest-src
 - pushd /tmp/gtest-build && cmake -DCMAKE_INSTALL_PREFIX:PATH=/tmp/gtest-install /tmp/gtest-src && cmake --build . && cmake --build . --target install && popd
