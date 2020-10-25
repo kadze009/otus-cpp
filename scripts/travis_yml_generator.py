@@ -167,7 +167,7 @@ def gen_travis_yaml(changed):
         f.write(gen_warning())
         f.write("""language: cpp
 os: linux
-dist: xenial
+dist: focal
 compiler: gcc
 
 before_install:
@@ -177,7 +177,7 @@ before_install:
 # Install dependencies
 install: 
   # C++17
-  - sudo apt-get install -qq g++-10 libstdc++-10-dev
+  - sudo apt-get install -qq g++-10
   - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-10 90
 
 before_script:
