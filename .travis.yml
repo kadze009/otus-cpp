@@ -17,3 +17,6 @@ before_script:
 
 jobs:
   include:
+    - stage: Build && Test && Package
+      script: echo 'hw1.1-CI_CD_helloworld' && pushd 'hw1.1-CI_CD_helloworld' && mkdir build && cd build && cmake -DGTEST_ROOT=/tmp/gtest-install .. && cmake --build . && cmake --build . --target test && cmake --build . --target package && popd
+    - script: echo 'hw1.2-ip_filter' && pushd 'hw1.2-ip_filter' && mkdir build && cd build && cmake -DGTEST_ROOT=/tmp/gtest-install .. && cmake --build . && cmake --build . --target test && cmake --build . --target package && popd
