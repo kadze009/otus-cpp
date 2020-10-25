@@ -4,13 +4,18 @@
 #
 
 language: cpp
+dist: bionic
+compiler: gcc
 
 before_script:
 - sudo apt-get install libboost-test-dev -y
 - echo "deb http://archive.ubuntu.com/ubuntu xenial main universe" | sudo tee -a /etc/apt/sources.list
 - sudo apt-get update -qq
+- mkdir /tmp/gtest-src /tmp/gtest-build /tmp/gtest-install
+- git clone https://github.com/google/googletest /tmp/gtest-src
+- pushd /tmp/gtest-build && cmake -DCMAKE_INSTALL_PREFIX:PATH=/tmp/gtest-install /tmp/gtest-src && cmake --build . && cmake --build . --target install && popd
 
 jobs:
   include:
     - stage: Build && Test && Package
-      script: echo 'hw1.1-CI_CD_helloworld' && pushd 'hw1.1-CI_CD_helloworld' && mkdir build && cd build && cmake .. && cmake --build . && cmake --build . --target test && cmake --build . --target package && popd
+      script: echo 'hw1.2-ip_filter' && pushd 'hw1.2-ip_filter' && mkdir build && cd build && cmake -DGTEST_ROOT=/tmp/gtest-install .. && cmake --build . && cmake --build . --target test && cmake --build . --target package && popd
