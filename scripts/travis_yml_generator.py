@@ -167,7 +167,7 @@ def gen_travis_yaml(changed):
         f.write(gen_warning())
         f.write("""language: cpp
 os: linux
-dist: focal
+dist: xenial
 compiler: gcc
 
 before_install:
@@ -177,8 +177,8 @@ before_install:
 # Install dependencies
 install: 
   # C++17
-  - sudo apt-get install -qq g++-10
-  - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-10 90
+  - sudo apt-get install -qq g++-9
+  - sudo update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-9 90 --slave /usr/bin/g++ g++ /usr/bin/g++-9
 
 before_script:
 - sudo apt-get install libboost-test-dev -y
