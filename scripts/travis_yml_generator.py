@@ -178,7 +178,7 @@ before_install:
 # Install dependencies
 install:
   # C++17
-  - sudo apt-get install -qq g++-7
+  - sudo apt-get install -qq g++-7 libstdc++-7-dev
   - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-7 90
 
 before_script:
