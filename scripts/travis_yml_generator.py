@@ -236,7 +236,25 @@ def main():
 
     log_i('Getting last green commit')
     last_green = last_green_travis_build()
+
+    log_i('Collect valued changes')
+    changed = set()
+    for line in shell_exec(f'git diff --name-only HEAD {last_green}').split('\n'):
+        file_root = line.split('/')[0]
+        for prefix in Config.CTRL_PREFIXES:
+            if file_root.startswith(prefix):
+                changed.add(file_root)
+                break
+    if changed:
+        log_i('Generation new CI configuration')
+        yml_name = gen_travis_yaml(changed)
+        commit_changes(yml_name)
+        log_w('Disable "git push"')
+        Config.set_state(False)
+
     if not Config.get_state():
+        self_path = Config.self_path(is_abs=True)
+        push_cmd  = f'{self_path} --set_ready && git push\n' if changed else ''
         log_e('''
 =======================================
 !!! 'git push' command was disabled !!!
@@ -251,24 +269,10 @@ Possible commads:
 {1} --set_ready
 {1} --set_commit NEW_COMMIT
 {1} --set_ready --set_commit NEW_COMMIT
-
-'''.format(last_green, Config.self_path(is_abs=True)))
+{2}
+'''.format(last_green, self_path, push_cmd))
         return 1
 
-    log_i('Collect valued changes')
-    changed = set()
-    for line in shell_exec(f'git diff --name-only HEAD {last_green}').split('\n'):
-        file_root = line.split('/')[0]
-        for prefix in Config.CTRL_PREFIXES:
-            if file_root.startswith(prefix):
-                changed.add(file_root)
-                break
-    if changed:
-        log_i('Generation CI configuration')
-        yml_name = gen_travis_yaml(changed)
-        commit_changes(yml_name)
-    log_w('Disable "git push"')
-    Config.set_state(False)
     return 0
 
 
