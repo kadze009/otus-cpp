@@ -148,10 +148,8 @@ def gen_travis_yaml(changed):
 
     if not changed: return False
     stage_parts = []
-    for changed_dir in changed:
-        yml_part = '    - script: '
-        if not stage_parts:
-            yml_part = '    - stage: Build && Test && Package\n      script: '
+    for changed_dir in sorted(changed):
+        yml_part = '    - script: ' if stage_parts else '    - stage: Build && Test && Package\n      script: '
         commands = [
             f"echo '{changed_dir}'",
             f"pushd '{changed_dir}'",
@@ -163,8 +161,7 @@ def gen_travis_yaml(changed):
             "cmake --build . --target package",
             "popd",
         ]
-        yml_part += ' && '.join(commands)
-        stage_parts.append(yml_part)
+        stage_parts.append(yml_part + ' && '.join(commands))
 
     with open(TRAVIS_YAML_NAME, 'w') as f:
         f.write(gen_warning())
@@ -183,7 +180,9 @@ before_script:
 jobs:
   include:
 """)
-        for part in stage_parts: f.write(part)
+        for part in stage_parts:
+            f.write(part)
+            f.write('\n')
 #        f.write("""
 #deploy:
 #  provider: script
@@ -197,7 +196,8 @@ jobs:
 def commit_changes(yml):
     shell_exec(f'git add {yml}')
     if [1 for line in shell_exec('git status -s').split('\n') if not line.startswith('??')]:
-        shell_exec(f'git commit -m "[AUTO] regen {yml} before pushing"')
+        yml_name = yml.split('/')[-1]
+        return 0 == shell_exec(f'git commit -m "[AUTO] regen {yml_name} before pushing"', check_succ=False)[0]
 
 
 def InitRepo():
@@ -248,9 +248,9 @@ def main():
     if changed:
         log_i('Generation new CI configuration')
         yml_name = gen_travis_yaml(changed)
-        commit_changes(yml_name)
-        log_w('Disable "git push"')
-        Config.set_state(False)
+        if commit_changes(yml_name):
+            log_w('Disable "git push"')
+            Config.set_state(False)
 
     if not Config.get_state():
         self_path = Config.self_path(is_abs=True)
