@@ -218,8 +218,10 @@ jobs:
         for project in changed_projects:
             f.write(f"""
   - provider: script
-    cleanup: true
+    cleanup: false
     script: bash scripts/deploy.sh {project.name} {project.dir}
+    on:
+      branch: main
 """)
         f.write('\n')
     return TRAVIS_CI_CFG_PATH
