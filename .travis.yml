@@ -26,13 +26,15 @@ before_script:
 jobs:
   include:
     - stage: Build && Test && Package
-      script: mkdir -p 'hw1.1-CI_CD_helloworld/build'pushd 'hw1.1-CI_CD_helloworld/build' && cmake -DGTEST_ROOT=/tmp/gtest-install .. && cmake --build . && cmake --build . --target test && cmake --build . --target package && popd
-    - script: mkdir -p 'hw1.2-ip_filter/build'pushd 'hw1.2-ip_filter/build' && cmake -DGTEST_ROOT=/tmp/gtest-install .. && cmake --build . && cmake --build . --target test && cmake --build . --target package && popd
+      script: mkdir -p 'hw1.1-helloworld/build' && pushd 'hw1.1-helloworld/build' && cmake -DGTEST_ROOT=/tmp/gtest-install .. && cmake --build . && cmake --build . --target test && cmake --build . --target package && popd
+    - script: mkdir -p 'hw1.2-ip_filter/build' && pushd 'hw1.2-ip_filter/build' && cmake -DGTEST_ROOT=/tmp/gtest-install .. && cmake --build . && cmake --build . --target test && cmake --build . --target package && popd
 
 deploy:
-  provider: script
-  skip_cleanup: true
-  script:
-  - pushd 'hw1.1-CI_CD_helloworld/build' && export PROJ_VERSION=`grep --color=never -w 'CMAKE_PROJECT_VERSION:STATIC' CMakeCache.txt | cut -d= -f2` && export PROJ_DEB=`ls --color=never *.deb` && export PROJ_NAME=CI_CD_helloworld && curl -T ${PROJ_DEB} -u kadze009:${BINTRAY_API_KEY} "https://api.bintray.com/content/kadze009/otus-cpp/${PROJ_NAME}/${PROJ_VERSION}/${PROJ_DEB};deb_distribution=trusty;deb_component=main;deb_architecture=amd64;publish=1" && popd
-  - pushd 'hw1.2-ip_filter/build' && export PROJ_VERSION=`grep --color=never -w 'CMAKE_PROJECT_VERSION:STATIC' CMakeCache.txt | cut -d= -f2` && export PROJ_DEB=`ls --color=never *.deb` && export PROJ_NAME=ip_filter && curl -T ${PROJ_DEB} -u kadze009:${BINTRAY_API_KEY} "https://api.bintray.com/content/kadze009/otus-cpp/${PROJ_NAME}/${PROJ_VERSION}/${PROJ_DEB};deb_distribution=trusty;deb_component=main;deb_architecture=amd64;publish=1" && popd
+  - provider: script
+    cleanup: true
+    script: bash scripts/deploy.sh helloworld hw1.1-helloworld
+
+  - provider: script
+    cleanup: true
+    script: bash scripts/deploy.sh ip_filter hw1.2-ip_filter
 
