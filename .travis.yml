@@ -30,14 +30,14 @@ jobs:
       deploy:
         provider: script
         skip_cleanup: true
-        script: bash scripts/deploy.sh helloworld hw1.1-helloworld
+        script: bash scripts/deploy.sh helloworld hw1.1-helloworld/build
         on:
           branch: main
     - script: mkdir -p 'hw1.2-ip_filter/build' && pushd 'hw1.2-ip_filter/build' && cmake -DGTEST_ROOT=/tmp/gtest-install .. && cmake --build . && cmake --build . --target test && cmake --build . --target package && popd
       deploy:
         provider: script
         skip_cleanup: true
-        script: bash scripts/deploy.sh ip_filter hw1.2-ip_filter
+        script: bash scripts/deploy.sh ip_filter hw1.2-ip_filter/build
         on:
           branch: main
 

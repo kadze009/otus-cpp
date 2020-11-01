@@ -219,7 +219,7 @@ jobs:
             f.write(f"""
   - provider: script
     skip_cleanup: true
-    script: bash scripts/deploy.sh {project.name} {project.dir}
+    script: bash scripts/deploy.sh {project.name} {project.build_dir}
     on:
       branch: main
 """)

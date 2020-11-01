@@ -9,7 +9,7 @@ BINTRAY_REPO='otus-cpp'
 
 function usage()
 {
-	echo "Usage: $0 <PROJ_NAME> <PROJ_DIR>"
+	echo "Usage: $0 <PROJ_NAME> <PROJ_BUILD_DIR>"
 }
 
 function LogE()
@@ -19,7 +19,7 @@ function LogE()
 
 
 PROJ_NAME="${1}"
-PROJ_DIR="${2}"
+PROJ_BUILD_DIR="${2}"
 
 if [ $# -ne 2 ] ; then
 	LogE "Unexpected number of arguments: exp=2, act=$#"
@@ -27,14 +27,13 @@ if [ $# -ne 2 ] ; then
 	exit 1
 fi
 
-if [ ! -d "${PROJ_DIR}" ] ; then
-	LogE "PROJ_DIR=[${PROJ_DIR}] is not directory"
+if [ ! -d "${PROJ_BUILD_DIR}" ] ; then
+	LogE "PROJ_BUILD_DIR=[${PROJ_BUILD_DIR}] is not directory"
 	usage
 	exit 2
 fi
 
-pwd; ls -la
-cd "${PROJ_DIR}"
+cd "${PROJ_BUILD_DIR}"
 pwd; ls -la
 PROJ_VERSION=$(grep --color=never -w 'CMAKE_PROJECT_VERSION:STATIC' CMakeCache.txt | cut -d= -f2)
 PROJ_DEB=$(ls --color=never *.deb)
