@@ -220,7 +220,7 @@ deploy:
   script:
 """)
         for project in changed_projects:
-            f.write('- ')
+            f.write('  - ')
             cmds = [
                 f"pushd '{project.build_dir}'",
                  "export PROJ_VERSION=`grep --color=never -w 'CMAKE_PROJECT_VERSION:STATIC' CMakeCache.txt | cut -d= -f2`",
