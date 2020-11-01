@@ -218,7 +218,7 @@ jobs:
         for project in changed_projects:
             f.write(f"""
   - provider: script
-    cleanup: false
+    skip_cleanup: true
     script: bash scripts/deploy.sh {project.name} {project.dir}
     on:
       branch: main

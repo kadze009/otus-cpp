@@ -31,13 +31,13 @@ jobs:
 
 deploy:
   - provider: script
-    cleanup: false
+    skip_cleanup: true
     script: bash scripts/deploy.sh helloworld hw1.1-helloworld
     on:
       branch: main
 
   - provider: script
-    cleanup: false
+    skip_cleanup: true
     script: bash scripts/deploy.sh ip_filter hw1.2-ip_filter
     on:
       branch: main
