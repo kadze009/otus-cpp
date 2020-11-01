@@ -174,7 +174,7 @@ def gen_travis_yaml(changed_projects):
     for project in changed_projects:
         yml_part = '    - script: ' if stage_parts else '    - stage: Build && Test && Package\n      script: '
         commands = [
-            f"mkdir -p '{project.build_dir}'"
+            f"mkdir -p '{project.build_dir}'",
             f"pushd '{project.build_dir}'",
             "cmake -DGTEST_ROOT=/tmp/gtest-install ..",
             "cmake --build .",
@@ -213,26 +213,14 @@ jobs:
             f.write(part)
             f.write('\n')
 
-        f.write("""
-deploy:
-  provider: script
-  skip_cleanup: true
-  script:
-""")
+
+        f.write("\ndeploy:")
         for project in changed_projects:
-            f.write('  - ')
-            cmds = [
-                f"pushd '{project.build_dir}'",
-                 "export PROJ_VERSION=`grep --color=never -w 'CMAKE_PROJECT_VERSION:STATIC' CMakeCache.txt | cut -d= -f2`",
-                 "export PROJ_DEB=`ls --color=never *.deb`",
-                f"export PROJ_NAME={project.name}",
-                 'curl -T ${PROJ_DEB} -u kadze009:${BINTRAY_API_KEY} '
-                    '"https://api.bintray.com/content/kadze009/otus-cpp/${PROJ_NAME}/${PROJ_VERSION}'
-                    '/${PROJ_DEB};deb_distribution=trusty;deb_component=main;deb_architecture=amd64;publish=1"',
-                 "popd",
-            ]
-            f.write(" && ".join(cmds))
-            f.write('\n')
+            f.write(f"""
+  - provider: script
+    cleanup: true
+    script: bash scripts/deploy.sh {project.name} {project.dir}
+""")
         f.write('\n')
     return TRAVIS_CI_CFG_PATH
 
