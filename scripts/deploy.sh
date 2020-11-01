@@ -33,7 +33,9 @@ if [ ! -d "${PROJ_DIR}" ] ; then
 	exit 2
 fi
 
-cd ${PROJ_DIR}
+pwd; ls -la
+cd "${PROJ_DIR}"
+pwd; ls -la
 PROJ_VERSION=$(grep --color=never -w 'CMAKE_PROJECT_VERSION:STATIC' CMakeCache.txt | cut -d= -f2)
 PROJ_DEB=$(ls --color=never *.deb)
 curl -T "${PROJ_DEB}" -u ${BINTRAY_USER}:${BINTRAY_API_KEY} \
