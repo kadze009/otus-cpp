@@ -67,6 +67,7 @@ class Config:
     CTRL_PREFIXES           = ['hw']
     GIT_ROOT                = '.'
     GIT_INIT_COMMIT         = 'd829c61855aff7241e12d8578d4a66a7118eb327'
+    TRAVIS_CI_CFG_NAME      = '.travis.yml'
     TRAVIS_CI_DIR           = '.git/travis-ci'
     LAST_GREEN_COMMIT_FNAME = '.git/travis-ci/last_green_build_commit'
     STATE_FNAME             = '.git/travis-ci/state'
@@ -96,7 +97,7 @@ class Config:
         parser.add_argument('--init',       action='store_true', help='Initialize repo for developer')
         parser.add_argument('--set_ready',  action='store_true', help='Approve pushing changes')
         parser.add_argument('--set_commit', metavar='HASH',      help='Set last \033[92mGREEN\033[0m commit')
-        parser.add_argument('--exec_main',   action='store_true', help='Execute main functionality')
+        parser.add_argument('--exec_main',  action='store_true', help='Execute main functionality')
         args = parser.parse_args()
         Config.NEED_INIT   = args.init
         Config.SET_READY   = args.set_ready
@@ -127,6 +128,27 @@ class Config:
         with open(Config.LAST_GREEN_COMMIT_FNAME, 'w') as f:
             f.write(commit)
 
+
+class Project:
+    def __init__(self, dir_name):
+        self.sep       = '-'
+        self.dir       = dir_name
+        self.build_dir = dir_name + '/build'
+        sep_index      = dir_name.index(self.sep)
+        self.prefix    = dir_name[0:sep_index]
+        self.name      = dir_name[sep_index+1:]
+    def full_name(self):
+        return '{}{}{}'.format(self.prefix, self.sep, self.name)
+    # for set()
+    def __hash__(self):
+        return hash(self.dir)
+    def __eq__(self, v):
+        return self.dir == v.dir
+    # for sorted()
+    def __lt__(self, v):
+        return self.dir < v.dir
+
+
 def gen_warning():
     return """# This is autogen file by tools/travis_yml_generator.py
 # Do not change it manualy because after a next `git push` command this file
@@ -143,18 +165,17 @@ def last_green_travis_build():
     return commit if commit else Config.GIT_INIT_COMMIT
 
 
-def gen_travis_yaml(changed):
-    TRAVIS_YAML_NAME = f'{Config.GIT_ROOT}/.travis.yml'
+def gen_travis_yaml(changed_projects):
+    TRAVIS_CI_CFG_PATH = f'{Config.GIT_ROOT}/{Config.TRAVIS_CI_CFG_NAME}'
 
-    if not changed: return False
+    if not changed_projects: return False
+    changed_projects = sorted(changed_projects)
     stage_parts = []
-    for changed_dir in sorted(changed):
+    for project in changed_projects:
         yml_part = '    - script: ' if stage_parts else '    - stage: Build && Test && Package\n      script: '
         commands = [
-            f"echo '{changed_dir}'",
-            f"pushd '{changed_dir}'",
-            "mkdir build",
-            "cd build",
+            f"mkdir -p '{project.build_dir}'"
+            f"pushd '{project.build_dir}'",
             "cmake -DGTEST_ROOT=/tmp/gtest-install ..",
             "cmake --build .",
             "cmake --build . --target test",
@@ -163,7 +184,7 @@ def gen_travis_yaml(changed):
         ]
         stage_parts.append(yml_part + ' && '.join(commands))
 
-    with open(TRAVIS_YAML_NAME, 'w') as f:
+    with open(TRAVIS_CI_CFG_PATH, 'w') as f:
         f.write(gen_warning())
         f.write("""language: cpp
 os: linux
@@ -191,14 +212,29 @@ jobs:
         for part in stage_parts:
             f.write(part)
             f.write('\n')
-#        f.write("""
-#deploy:
-#  provider: script
-#  skip_cleanup: true
-#  script:
-#  - curl -T helloworld-0.0.$TRAVIS_BUILD_NUMBER-Linux.deb -ustarokurov:$BINTRAY_API_KEY "https://api.bintray.com/content/starokurov/otus-cpp/helloworld/$TRAVIS_BUILD_NUMBER/helloworld-0.0.$TRAVIS_BUILD_NUMBER-Linux.deb;deb_distribution=trusty;deb_component=main;deb_architecture=amd64;publish=1"
-#""")
-    return TRAVIS_YAML_NAME
+
+        f.write("""
+deploy:
+  provider: script
+  skip_cleanup: true
+  script:
+""")
+        for project in changed_projects:
+            f.write('- ')
+            cmds = [
+                f"pushd '{project.build_dir}'",
+                 "export PROJ_VERSION=`grep --color=never -w 'CMAKE_PROJECT_VERSION:STATIC' CMakeCache.txt | cut -d= -f2`",
+                 "export PROJ_DEB=`ls --color=never *.deb`",
+                f"export PROJ_NAME={project.name}",
+                 'curl -T ${PROJ_DEB} -u kadze009:${BINTRAY_API_KEY} '
+                    '"https://api.bintray.com/content/kadze009/otus-cpp/${PROJ_NAME}/${PROJ_VERSION}'
+                    '/${PROJ_DEB};deb_distribution=trusty;deb_component=main;deb_architecture=amd64;publish=1"',
+                 "popd",
+            ]
+            f.write(" && ".join(cmds))
+            f.write('\n')
+        f.write('\n')
+    return TRAVIS_CI_CFG_PATH
 
 
 def commit_changes(yml):
@@ -251,10 +287,10 @@ def main():
         file_root = line.split('/')[0]
         for prefix in Config.CTRL_PREFIXES:
             if file_root.startswith(prefix):
-                changed.add(file_root)
+                changed.add(Project(file_root))
                 break
     if changed:
-        log_i('Generation new CI configuration')
+        log_i('Generation new CI configuration for {} project(s)'.format(len(changed)))
         yml_name = gen_travis_yaml(changed)
         if commit_changes(yml_name):
             log_w('Disable "git push"')
