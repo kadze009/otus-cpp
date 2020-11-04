@@ -2,7 +2,7 @@
 
 set -e
 
-BINTRAY_USER='kadze009'
+BINTRAY_USER='zhaldak'
 BINTRAY_REPO='otus-cpp'
 #BINTRAY_API_KEY=''
 

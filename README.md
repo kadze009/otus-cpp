@@ -1,10 +1,10 @@
-# otus-cpp [![Build Status](https://travis-ci.com/kadze009/otus-cpp.svg?branch=main)](https://travis-ci.com/kadze009/otus-cpp)
+# otus-cpp [![Build Status](https://travis-ci.com/zhaldak/otus-cpp.svg?branch=main)](https://travis-ci.com/zhaldak/otus-cpp)
 
 This is the repository with homeworks of [otus c++'s](https://otus.ru/learning/73720/) courses.
 
 ## Useful links
-* [Travic CI](https://travis-ci.com/github/kadze009/otus-cpp)
-* [Bintray](https://bintray.com/kadze009/otus-cpp)
+* [Travic CI](https://travis-ci.com/github/zhaldak/otus-cpp)
+* [Bintray](https://bintray.com/zhaldak/otus-cpp)
 
 ## CI details
 There are some [scripts](scripts) which make CI usage more strict and
