@@ -172,7 +172,7 @@ def gen_travis_yaml(changed_projects):
     changed_projects = sorted(changed_projects)
     stage_parts = []
     for project in changed_projects:
-        yml_part = '    - script: ' if stage_parts else '    - stage: Build && Test && Package\n      script: '
+        yml_part = '    - script: ' if stage_parts else '    - stage: Build && Test && Deploy\n      script: '
         commands = [
             f"mkdir -p '{project.build_dir}'",
             f"pushd '{project.build_dir}'",
@@ -182,7 +182,15 @@ def gen_travis_yaml(changed_projects):
             "cmake --build . --target package",
             "popd",
         ]
-        stage_parts.append(yml_part + ' && '.join(commands))
+        yml_part += ' && '.join(commands)
+        yml_part += f"""\n      deploy:
+        provider: script
+        skip_cleanup: true
+        script: bash scripts/deploy.sh {project.name} {project.build_dir}
+        on:
+          branch: main
+"""
+        stage_parts.append(yml_part)
 
     with open(TRAVIS_CI_CFG_PATH, 'w') as f:
         f.write(gen_warning())
@@ -212,17 +220,6 @@ jobs:
         for part in stage_parts:
             f.write(part)
             f.write('\n')
-
-
-        f.write("\ndeploy:")
-        for project in changed_projects:
-            f.write(f"""
-  - provider: script
-    skip_cleanup: true
-    script: bash scripts/deploy.sh {project.name} {project.build_dir}
-    on:
-      branch: main
-""")
         f.write('\n')
     return TRAVIS_CI_CFG_PATH
 
