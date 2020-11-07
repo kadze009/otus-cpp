@@ -226,7 +226,7 @@ jobs:
 
 def commit_changes(yml):
     shell_exec(f'git add {yml}')
-    if [1 for line in shell_exec('git status -s').split('\n') if not line.startswith('??')]:
+    if [1 for line in shell_exec('git status -uno --porcelian').split('\n')]:
         yml_name = yml.split('/')[-1]
         return 0 == shell_exec(f'git commit -m "[AUTO] regen {yml_name} before pushing"', check_succ=False)[0]
 
