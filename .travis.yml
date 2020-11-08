@@ -26,15 +26,7 @@ before_script:
 jobs:
   include:
     - stage: Build && Test && Deploy
-      script: mkdir -p 'hw1.1-helloworld/build' && pushd 'hw1.1-helloworld/build' && cmake -DGTEST_ROOT=/tmp/gtest-install .. && cmake --build . && cmake --build . --target test && cmake --build . --target package && popd
-      deploy:
-        provider: script
-        skip_cleanup: true
-        script: bash scripts/deploy.sh helloworld hw1.1-helloworld/build
-        on:
-          branch: main
-
-    - script: mkdir -p 'hw1.2-ip_filter/build' && pushd 'hw1.2-ip_filter/build' && cmake -DGTEST_ROOT=/tmp/gtest-install .. && cmake --build . && cmake --build . --target test && cmake --build . --target package && popd
+      script: mkdir -p 'hw1.2-ip_filter/build' && pushd 'hw1.2-ip_filter/build' && cmake -DGTEST_ROOT=/tmp/gtest-install .. && cmake --build . && cmake --build . --target test && cmake --build . --target package && popd
       deploy:
         provider: script
         skip_cleanup: true
