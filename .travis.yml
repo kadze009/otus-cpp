@@ -34,4 +34,12 @@ jobs:
         on:
           branch: main
 
+    - script: mkdir -p 'hw2-custom_allocator/build' && pushd 'hw2-custom_allocator/build' && cmake -DGTEST_ROOT=/tmp/gtest-install .. && cmake --build . && cmake --build . --target test && cmake --build . --target package && popd
+      deploy:
+        provider: script
+        skip_cleanup: true
+        script: bash scripts/deploy.sh custom_allocator hw2-custom_allocator/build
+        on:
+          branch: main
+
 
