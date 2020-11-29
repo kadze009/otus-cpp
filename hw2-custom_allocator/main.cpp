@@ -45,17 +45,16 @@ int main()
         }
         std::cout << "-------------------\n\n";
     }
-	/*
     {
         custom_list<int> list_std_alloc;
-        for (int i = 0; i < MAX_NUM; ++i) { list_std_alloc.push_back(memo[i]); }
+        for (size_t i = 0; i < MAX_NUM; ++i) { list_std_alloc.push_back(memo[i]); }
 
-        using alloc_t = logging_allocator<int>;
+        using alloc_t = custom_allocator<int>;
         alloc_t alloc;
-        alloc.capacity(MAX_NUM):
+        alloc.capacity(MAX_NUM);
 
         custom_list<int, alloc_t> list_alloc {alloc};
-        for (int i = 0; i < MAX_NUM; ++i) { list_alloc.push_back(memo[i]); }
+        for (size_t i = 0; i < MAX_NUM; ++i) { list_alloc.push_back(memo[i]); }
 
         std::cout << "---[ std ]---\n";
         for (int num : list_std_alloc) { std::cout << num << ' '; }
@@ -65,7 +64,6 @@ int main()
         for (int num : list_alloc) { std::cout << num << ' '; }
         std::cout << "\n----------------\n\n";
     }
-	*/
     return 0;
 }
 

@@ -5,7 +5,11 @@ project(custom_allocator VERSION 0.0.1$ENV{TRAVIS_BUILD_NUMBER})
 find_package(GTest REQUIRED)
 
 add_executable(custom_allocator main.cpp)
-add_executable(gtest_custom_allocator test/test_main.cpp)
+add_executable(gtest_custom_allocator
+	test/test_main.cpp
+	test/test_custom_alloc.cpp
+	test/test_custom_list.cpp
+)
 
 set_target_properties(custom_allocator gtest_custom_allocator PROPERTIES
     CXX_STANDARD 17
