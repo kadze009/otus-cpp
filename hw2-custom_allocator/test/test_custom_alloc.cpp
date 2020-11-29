@@ -4,6 +4,8 @@
 
 #include "custom_allocator.hpp"
 
+#define UNUSED(a)    (void)a
+
 
 TEST(CustomAllocator, sanity)
 {
@@ -41,7 +43,7 @@ TEST(CustomAllocator, sanity)
 
     ASSERT_THROW(alloc.capacity(EXP_CAPACITY - 1), std::runtime_error);
     ASSERT_THROW(alloc.capacity(EXP_CAPACITY + 1), std::runtime_error);
-    ASSERT_THROW(alloc_tt::allocate(alloc, alloc_tt::max_size(alloc) + 1), std::bad_alloc);
+    ASSERT_THROW(UNUSED(alloc_tt::allocate(alloc, alloc_tt::max_size(alloc) + 1)), std::bad_alloc);
     EXPECT_EQ(2, alloc.size());
     EXPECT_EQ(EXP_CAPACITY - 2, alloc_tt::max_size(alloc));
 
@@ -52,7 +54,7 @@ TEST(CustomAllocator, sanity)
     EXPECT_EQ(EXP_CAPACITY, alloc.capacity());
     EXPECT_EQ(EXP_CAPACITY, alloc.size());
     EXPECT_EQ(0, alloc_tt::max_size(alloc));
-    ASSERT_THROW(alloc_tt::allocate(alloc, 1), std::bad_alloc);
+    ASSERT_THROW(UNUSED(alloc_tt::allocate(alloc, 1)), std::bad_alloc);
 
     alloc_tt::deallocate(alloc, pLEFTi, LEFT_NUM);
     EXPECT_EQ(0, alloc_tt::max_size(alloc));
@@ -75,7 +77,7 @@ TEST(CustomAllocator, defCtor)
     EXPECT_EQ(0, alloc.capacity());
     EXPECT_EQ(0, alloc.size());
     EXPECT_EQ(0, alloc_tt::max_size(alloc));
-    ASSERT_THROW(alloc_tt::allocate(alloc, 1), std::bad_alloc);
+    ASSERT_THROW(UNUSED(alloc_tt::allocate(alloc, 1)), std::bad_alloc);
 }
 
 
