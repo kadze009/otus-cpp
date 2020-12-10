@@ -139,6 +139,11 @@ class Project:
         self.name      = dir_name[sep_index+1:]
     def full_name(self):
         return '{}{}{}'.format(self.prefix, self.sep, self.name)
+    def has_ut(self):
+        cmake_cfg = self.dir + '/CMakeLists.txt'
+        if not os.path.isfile(cmake_cfg): return False
+        ec, _ = shell_exec(f"grep -w enable_testing {cmake_cfg}", check_succ=False)
+        return 0 == ec
     # for set()
     def __hash__(self):
         return hash(self.dir)
@@ -173,15 +178,17 @@ def gen_travis_yaml(changed_projects):
     stage_parts = []
     for project in changed_projects:
         yml_part = '    - script: ' if stage_parts else '    - stage: Build && Test && Deploy\n      script: '
+        cmd_test = "cmake --build . --target test"
         commands = [
             f"mkdir -p '{project.build_dir}'",
             f"pushd '{project.build_dir}'",
             "cmake -DGTEST_ROOT=/tmp/gtest-install ..",
             "cmake --build .",
-            "cmake --build . --target test",
+            cmd_test,
             "cmake --build . --target package",
             "popd",
         ]
+        if not project.has_ut(): commands.remove(cmd_test)
         yml_part += ' && '.join(commands)
         yml_part += f"""\n      deploy:
         provider: script
