@@ -26,7 +26,7 @@ before_script:
 jobs:
   include:
     - stage: Build && Test && Deploy
-      script: mkdir -p 'hw3-print_ip/build' && pushd 'hw3-print_ip/build' && cmake -DGTEST_ROOT=/tmp/gtest-install .. && cmake --build . && cmake --build . --target test && cmake --build . --target package && popd
+      script: mkdir -p 'hw3-print_ip/build' && pushd 'hw3-print_ip/build' && cmake -DGTEST_ROOT=/tmp/gtest-install .. && cmake --build . && cmake --build . --target package && popd
       deploy:
         provider: script
         skip_cleanup: true
