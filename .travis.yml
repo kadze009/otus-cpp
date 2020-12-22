@@ -26,11 +26,11 @@ before_script:
 jobs:
   include:
     - stage: Build && Test && Deploy
-      script: mkdir -p 'hw3-print_ip/build' && pushd 'hw3-print_ip/build' && cmake -DGTEST_ROOT=/tmp/gtest-install .. && cmake --build . && cmake --build . --target package && popd
+      script: mkdir -p 'hw6-bulk/build' && pushd 'hw6-bulk/build' && cmake -DGTEST_ROOT=/tmp/gtest-install .. && cmake --build . && cmake --build . --target test && cmake --build . --target package && popd
       deploy:
         provider: script
         skip_cleanup: true
-        script: bash scripts/deploy.sh print_ip hw3-print_ip/build
+        script: bash scripts/deploy.sh bulk hw6-bulk/build
         on:
           branch: main
 
